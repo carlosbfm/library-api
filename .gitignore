@@ -1,0 +1,66 @@
+### Projeto ###
+HELP.md
+target/
+.mvn/wrapper/maven-wrapper.jar
+!**/src/main/**/target/
+!**/src/test/**/target/
+
+### Segurança e Configurações Locais (MUITO IMPORTANTE) ###
+# Ignora arquivos de variáveis de ambiente e senhas
+.env
+.env.*
+*.local
+application-dev.yml
+application-dev.properties
+
+### Logs ###
+# Ignora arquivos de log gerados pela aplicação
+*.log
+logs/
+
+### Sistema Operacional ###
+# Ignora arquivos temporários e de indexação do Windows e macOS
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+desktop.ini
+
+### STS / Eclipse ###
+.apt_generated
+.classpath
+.factorypath
+.project
+.settings
+.springBeans
+.sts4-cache
+bin/
+!**/src/main/**/bin/
+!**/src/test/**/bin/
+
+### IntelliJ IDEA ###
+.idea/
+.idea/*
+*.iws
+*.iml
+*.ipr
+out/
+!**/src/main/**/out/
+!**/src/test/**/out/
+
+### NetBeans ###
+/nbproject/private/
+/nbbuild/
+/dist/
+/nbdist/
+/.nb-gradle/
+build/
+!**/src/main/**/build/
+!**/src/test/**/build/
+
+### VS Code ###
+.vscode/
+*.code-workspace
