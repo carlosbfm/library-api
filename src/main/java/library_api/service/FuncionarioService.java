@@ -78,7 +78,7 @@ public class FuncionarioService {
                 .login(matriculaGerada) 
                 .password(senhaHasheada) 
                 .dataExpiracaoSenha(LocalDate.now().plusMonths(3))
-                .roles("ROLE_" + cargo.getNomeCargo().name()) 
+                .roles("ROLE_" + cargo.getNomeCargo().getRole()) 
                 .build();
 
         FuncionarioEntity novoFuncionario = FuncionarioEntity.builder()

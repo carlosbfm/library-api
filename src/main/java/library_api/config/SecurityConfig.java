@@ -32,7 +32,7 @@ public class SecurityConfig {
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)) // Não guarda sessão no servidor
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers(HttpMethod.POST, "/api/auth/login").permitAll() // Libera a rota de login para qualquer um
-                        .requestMatchers(HttpMethod.POST, "/api/funcionarios/**").permitAll()
+                        .requestMatchers(HttpMethod.POST,"/api/funcionarios/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/funcionarios/**").permitAll() // Libera o cadastro (só para testes, depois você protege!)
                         .anyRequest().authenticated() // Bloqueia todo o resto
                 )

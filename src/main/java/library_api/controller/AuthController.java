@@ -36,7 +36,7 @@ public class AuthController {
         
         var tokenJWT = tokenService.gerarToken(usuarioLogado);
 
-        FuncionarioEntity funcionario = funcionarioRepository.findById(usuarioLogado.getLogin())
+        FuncionarioEntity funcionario = funcionarioRepository.findByUsuarioLogin(usuarioLogado.getLogin())
                 .orElseThrow(() -> new RuntimeException("Dados de RH não encontrados para este usuário."));
 
         return ResponseEntity.ok().body(new DadosTokenJWT(
