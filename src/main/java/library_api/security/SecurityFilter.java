@@ -33,11 +33,11 @@ public class SecurityFilter extends OncePerRequestFilter {
             // 1. Buscamos o Optional do banco
             var usuarioOptional = repository.findByLogin(subject);
 
-            // 2. Verificamos se o usuário realmente existe dentro da "caixa" (Optional)
+            // 2. Verifica se o usuário realmente existe dentro da "caixa" (Optional)
             if (usuarioOptional.isPresent()) {
                 var usuarioEntity = usuarioOptional.get(); 
                 
-                // 3. Usamos o seu UsuarioDetailsImpl para garantir a compatibilidade com o Spring
+                // 3. UsuarioDetailsImpl para garantir a compatibilidade com o Spring
                 var userDetails = new UsuarioDetailsImpl(usuarioEntity);
 
                 // 4. Criamos o objeto de autenticação

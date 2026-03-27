@@ -14,14 +14,21 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
+import library_api.security.SecurityFilter;
+import lombok.RequiredArgsConstructor;
+
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity(securedEnabled = true, jsr250Enabled = true)
+@RequiredArgsConstructor
 public class SecurityConfig {
+
+    private final SecurityFilter securityFilter;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -32,10 +39,13 @@ public class SecurityConfig {
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)) // Não guarda sessão no servidor
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers(HttpMethod.POST, "/api/auth/login").permitAll() // Libera a rota de login para qualquer um
-                        .requestMatchers(HttpMethod.POST,"/api/funcionarios/**").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/api/funcionarios/**").permitAll() // Libera o cadastro (só para testes, depois você protege!)
+                        .requestMatchers(HttpMethod.POST,"/api/funcionarios/**").authenticated()
+                        .requestMatchers(HttpMethod.DELETE, "/api/funcionarios/**").authenticated()
+                        .requestMatchers(HttpMethod.GET, "/api/funcionarios/**").authenticated() // Libera o cadastro (só para testes, depois você protege!)
                         .anyRequest().authenticated() // Bloqueia todo o resto
                 )
+                //meu filtro antes do padrão
+                .addFilterBefore(securityFilter, UsernamePasswordAuthenticationFilter.class)
                 .build();
     }
 

@@ -20,6 +20,8 @@ public class UsuarioDetailsImpl implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
+        String roleDoBanco = usuario.getRoles();
+        System.out.println(">>> ROLE QUE VEIO DO BANCO: " + roleDoBanco);
         return List.of(new SimpleGrantedAuthority(usuario.getRoles()));
     }
 
