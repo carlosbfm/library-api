@@ -14,5 +14,6 @@ public interface ClienteMapper {
     @Mapping(target = "data", ignore = true)
     ClienteEntity toEntity(ClienteRequestDTO dto);
 
+    @Mapping(source = "tipoCliente.descricao", target = "tipoCliente")
     ClienteResponseDTO toDto(ClienteEntity cliente);
 }

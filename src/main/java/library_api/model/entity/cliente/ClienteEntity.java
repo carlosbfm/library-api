@@ -8,6 +8,8 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EntityListeners;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import library_api.model.enums.TipoCliente;
@@ -33,6 +35,7 @@ public class ClienteEntity {
     @Column(name = "nome_cliente", length = 100)
     private String nomeCliente;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "tipo_cliente", length = 50, nullable = false)
     private TipoCliente tipoCliente;
 
