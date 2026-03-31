@@ -33,7 +33,7 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         return http
-                // 1. A MÁGICA DO CORS: Isso diz ao Spring Security para olhar as regras do método lá embaixo
+                // 1. Spring Security para olhar as regras do método lá embaixo
                 .cors(cors -> cors.configurationSource(corsConfigurationSource())) 
                 .csrf(csrf -> csrf.disable()) // Desabilita proteção CSRF (necessário para APIs REST / JWT)
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)) // Não guarda sessão no servidor
@@ -74,7 +74,7 @@ public class SecurityConfig {
         return configuration.getAuthenticationManager();
     }
 
-    // Você já usa o PasswordEncoder no Service, mas ele precisa ser um Bean aqui!
+    // PasswordEncoder no Service, mas ele precisa ser um Bean aqui!
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();

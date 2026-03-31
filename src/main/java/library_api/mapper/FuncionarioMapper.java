@@ -17,7 +17,7 @@ public interface FuncionarioMapper {
     FuncionarioEntity toEntity(FuncionarioRequestDTO dto); // Pega os dados do DTO e transforma PARA Entidade.
     
     @Mapping(source = "cargo.salarioBase", target = "salarioBase")
-    @Mapping(source = "cargo.id", target = "cargo")
+    @Mapping(source = "cargo.nomeCargo", target = "cargo")
     FuncionarioResponseDTO toDto(FuncionarioEntity funcionario); // Pega os dados da Entidade e transforma PARA DTO.
 
 }
