@@ -34,6 +34,7 @@ public class ClienteController {
         return ResponseEntity.status(HttpStatus.CREATED).body(responseDTO);
     }
 
+    
     @PreAuthorize("isAuthenticated()")
     @GetMapping("/nome/{nome}")
     public ResponseEntity<List<ClienteResponseDTO>> buscarClientePorNome(@PathVariable String nome){
@@ -59,6 +60,13 @@ public class ClienteController {
     @GetMapping("/cnpj/{cnpj}")
     public ResponseEntity <ClienteResponseDTO> buscarClientePorCnpj(@PathVariable String cnpj){
         ClienteResponseDTO responseDTO = clienteService.buscarPorCnpj(cnpj);
+        return ResponseEntity.ok(responseDTO);
+    }
+
+    @PreAuthorize("isAuthenticated()")
+    @GetMapping("/codCliente/{codCliente}")
+    public ResponseEntity <ClienteResponseDTO> buscarPorCodigo(@PathVariable Long codCliente ){
+        ClienteResponseDTO responseDTO = clienteService.buscarPorCodCliente(codCliente);
         return ResponseEntity.ok(responseDTO);
     }
 

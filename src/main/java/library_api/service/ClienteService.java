@@ -90,6 +90,13 @@ public class ClienteService {
         return clienteMapper.toDto(clienteEncontrado);
     }
 
+    public ClienteResponseDTO buscarPorCodCliente(Long codCliente){
+        ClienteEntity clienteEncontrado = clienteRepository.findById(codCliente).
+        orElseThrow(() -> new RuntimeException("Cliente não encontrado com o Código: " + codCliente));
+
+        return clienteMapper.toDto(clienteEncontrado);
+    }
+
     @Transactional
     public ClienteResponseDTO atualizar(Long codCliente, ClienteRequestDTO dto){
         ClienteEntity clienteAtual = clienteRepository.findById(codCliente)
