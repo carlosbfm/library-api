@@ -42,7 +42,7 @@ public class LivroController {
     }
 
     @PreAuthorize("isAuthenticated")
-    @GetMapping("/livro/{titulo}")
+    @GetMapping("/titulo/{titulo}")
     public ResponseEntity<List<LivroResponseDTO>> buscarLivroPorTitulo(@PathVariable String titulo){
         List <LivroResponseDTO> responseDTOs = livroService.buscarPorTitulo(titulo);
         return ResponseEntity.ok(responseDTOs);
