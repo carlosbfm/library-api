@@ -16,6 +16,7 @@ public interface LivroMapper {
     @Mapping(target = "status", ignore = true)
     LivroEntity toEntity(LivroRequestDTO dto);
 
+    @Mapping(target = "isbn", expression = "java(library_api.util.DocumentoUtil.formataIsbn(livro.getIsbn()))")
     @Mapping(source = "status", target = "status", qualifiedByName = "statusToString")
     LivroResponseDTO toDto(LivroEntity livro);
 

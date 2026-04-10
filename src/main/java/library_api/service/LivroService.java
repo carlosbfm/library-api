@@ -11,6 +11,7 @@ import library_api.mapper.LivroMapper;
 import library_api.model.entity.livro.LivroEntity;
 import library_api.model.enums.StatusLivro;
 import library_api.repository.LivroRepository;
+import library_api.util.DocumentoUtil;
 import library_api.util.GeradorDeCodigos;
 import lombok.RequiredArgsConstructor;
 
@@ -26,12 +27,15 @@ public class LivroService {
     public LivroResponseDTO cadastrar(LivroRequestDTO dto) {
         LivroEntity livro = livroMapper.toEntity(dto);
 
+        String isbnLimpo = DocumentoUtil.formataIsbn(dto.isbn());
+        
         Long codigoGerado;
         do {
             codigoGerado = geradorDeCodigos.gerarCodLivro();
         } while (livroRepository.existsById(codigoGerado));
 
         livro.setCodLivro(codigoGerado);
+        livro.setIsbn(isbnLimpo);
         livro.setStatus(StatusLivro.DISPONIVEL);
 
         LivroEntity livroSalvo = livroRepository.save(livro);
@@ -82,13 +86,14 @@ public class LivroService {
     }
 
     public List<LivroResponseDTO> buscarPorIsbn(String isbn){
-        List<LivroEntity> isbnEncontradas = livroRepository.findByIsbn(isbn);
+        String isbnLimpa = DocumentoUtil.formataIsbn(isbn);
+        List<LivroEntity> livroEncontrados = livroRepository.findByIsbn(isbnLimpa);
 
-        if(isbnEncontradas.isEmpty()){
+        if(livroEncontrados.isEmpty()){
             throw new RuntimeException("Nenhum livro encontrado com a isbn: " + isbn);
         }
 
-        return isbnEncontradas.stream()
+        return livroEncontrados.stream()
                 .map(livroMapper::toDto)
                 .toList();
     }
@@ -102,13 +107,15 @@ public class LivroService {
 
     @Transactional
     public LivroResponseDTO atualizar(Long codLivro, LivroRequestDTO dto) {
+        String isbnLimpa = DocumentoUtil.formataIsbn(dto.isbn());
+
         LivroEntity entidade = livroRepository.findById(codLivro)
                 .orElseThrow(() -> new RuntimeException("Livro não encontrado com o código: " + codLivro));
 
         entidade.setTituloLivro(dto.tituloLivro());
         entidade.setAutor(dto.autor());
         entidade.setGenero(dto.genero());
-        entidade.setIsbn(dto.isbn());
+        entidade.setIsbn(isbnLimpa);
         entidade.setData(dto.data());
 
         LivroEntity livroAtualizado = livroRepository.save(entidade);
