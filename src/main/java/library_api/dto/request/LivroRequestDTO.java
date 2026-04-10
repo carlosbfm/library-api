@@ -7,6 +7,7 @@ import org.hibernate.validator.constraints.ISBN;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.PastOrPresent;
+import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 
 public record LivroRequestDTO(
@@ -22,8 +23,10 @@ public record LivroRequestDTO(
     @Size(max = 50)
     String genero,
 
-    @Size(max = 20)
     @ISBN
+    @Size(max = 20)
+    @Pattern(regexp = "(^\\d{13}$)|(^\\d{3}-\\d{2}-\\d{3}-\\d{4}-\\d{1}$)",
+        message = "A ISBN deve conter 13 números ou estar no formato XXX-XX-XXX-XXXX-X")
     String isbn,
 
     @NotNull(message = "É obrigatório preencher a data de lançamento do livro")

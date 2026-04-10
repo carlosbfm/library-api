@@ -6,6 +6,8 @@ import java.time.LocalDate;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import library_api.model.enums.StatusLivro;
@@ -43,6 +45,7 @@ public class LivroEntity {
     @Column(name = "data_lancamento")
     private LocalDate data;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "status", length = 100)
     private StatusLivro status;
 
