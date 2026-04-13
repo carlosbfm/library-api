@@ -21,7 +21,7 @@ public interface LivroRepository extends JpaRepository<LivroEntity, Long> {
 
     List<LivroEntity> findByGeneroContainingIgnoreCase(String genero);
 
-    List<LivroEntity> findByIsbn(String isbn);
+    List<LivroEntity> findByIsbnContainingIgnoreCase(String isbn);
 
     List<LivroEntity> findByData(LocalDate data);
 

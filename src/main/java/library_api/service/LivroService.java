@@ -86,11 +86,11 @@ public class LivroService {
     }
 
     public List<LivroResponseDTO> buscarPorIsbn(String isbn){
-        String isbnLimpa = DocumentoUtil.formataIsbn(isbn);
-        List<LivroEntity> livroEncontrados = livroRepository.findByIsbn(isbnLimpa);
+        String isbnLimpa = DocumentoUtil.limpaFormatacao(isbn);
+        List<LivroEntity> livroEncontrados = livroRepository.findByIsbnContainingIgnoreCase(isbnLimpa);
 
         if(livroEncontrados.isEmpty()){
-            throw new RuntimeException("Nenhum livro encontrado com a isbn: " + isbn);
+            throw new RuntimeException("Nenhum livro encontrado com a isbn: " + isbnLimpa);
         }
 
         return livroEncontrados.stream()
