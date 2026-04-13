@@ -17,6 +17,29 @@ import java.util.Map;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
+    @ExceptionHandler(RecursoNaoEncontradoException.class)
+    public ResponseEntity<ErroPadraoDTO> handleRecursoNaoEncontradoException(RecursoNaoEncontradoException ex, HttpServletRequest request) {
+        ErroPadraoDTO erro = new ErroPadraoDTO(
+                HttpStatus.NOT_FOUND.value(),
+                "Recurso Não Encontrado",
+                ex.getMessage(), 
+                request.getRequestURI()
+        );
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(erro);
+    }
+
+    @ExceptionHandler(RegraDeNegocioException.class)
+    public ResponseEntity<ErroPadraoDTO> handleRegraDeNegocioException(RegraDeNegocioException ex, HttpServletRequest request) {
+        ErroPadraoDTO erro = new ErroPadraoDTO(
+                HttpStatus.BAD_REQUEST.value(),
+                "Violação de Regra de Negócio",
+                ex.getMessage(), 
+                request.getRequestURI()
+        );
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(erro);
+    }
+
+
     @ExceptionHandler(DataIntegrityViolationException.class)
     public ResponseEntity<ErroPadraoDTO> handleDataIntegrityViolationException(DataIntegrityViolationException ex, HttpServletRequest request) {
         ErroPadraoDTO erro = new ErroPadraoDTO(
