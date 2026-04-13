@@ -2,6 +2,7 @@ package library_api.mapper;
 
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
+import org.mapstruct.MappingTarget;
 import org.mapstruct.Named;
 
 import library_api.dto.request.LivroRequestDTO;
@@ -19,6 +20,12 @@ public interface LivroMapper {
     @Mapping(target = "isbn", expression = "java(library_api.util.DocumentoUtil.formataIsbn(livro.getIsbn()))")
     @Mapping(source = "status", target = "status", qualifiedByName = "statusToString")
     LivroResponseDTO toDto(LivroEntity livro);
+
+
+    @Mapping(target = "codLivro", ignore = true)
+    @Mapping(target = "status", ignore = true)
+    @Mapping(target = "isbn", ignore = true) 
+    void atualizarDeDto(LivroRequestDTO dto, @MappingTarget LivroEntity entidade);
 
     @Named("statusToString")
     default String statusToString(StatusLivro status) {

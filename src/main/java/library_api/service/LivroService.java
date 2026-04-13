@@ -107,16 +107,21 @@ public class LivroService {
 
     @Transactional
     public LivroResponseDTO atualizar(Long codLivro, LivroRequestDTO dto) {
-        String isbnLimpa = DocumentoUtil.formataIsbn(dto.isbn());
 
-        LivroEntity entidade = livroRepository.findById(codLivro)
+        LivroEntity entidade = livroRepository.findByCodLivro(codLivro)
                 .orElseThrow(() -> new RuntimeException("Livro não encontrado com o código: " + codLivro));
 
-        entidade.setTituloLivro(dto.tituloLivro());
-        entidade.setAutor(dto.autor());
-        entidade.setGenero(dto.genero());
+        String isbnLimpa = DocumentoUtil.limpaFormatacao(dto.isbn());
+
+        livroRepository.findByIsbn(isbnLimpa).ifPresent(livroExistente -> {
+            if (!livroExistente.getCodLivro().equals(codLivro)) {
+                throw new RuntimeException("Violação de Integridade: O ISBN " + isbnLimpa + " já pertence a outro livro!");
+            }
+        });
+
+        livroMapper.atualizarDeDto(dto, entidade);
+
         entidade.setIsbn(isbnLimpa);
-        entidade.setData(dto.data());
 
         LivroEntity livroAtualizado = livroRepository.save(entidade);
         return livroMapper.toDto(livroAtualizado);
