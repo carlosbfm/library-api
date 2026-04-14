@@ -11,6 +11,8 @@ import org.springframework.transaction.annotation.Transactional;
 import library_api.dto.request.FuncionarioRequestDTO;
 import library_api.dto.response.FuncionarioCadastroResponseDTO;
 import library_api.dto.response.FuncionarioResponseDTO;
+import library_api.exception.RecursoNaoEncontradoException;
+import library_api.exception.RegraDeNegocioException;
 import library_api.mapper.FuncionarioMapper;
 import library_api.model.entity.funcionario.Cargo;
 import library_api.model.entity.funcionario.FuncionarioEntity;
@@ -41,14 +43,14 @@ public class FuncionarioService {
         String cpfLimpo = DocumentoUtil.limpaFormatacao(dto.cpf());
         
         if (funcionarioRepository.existsByCpf(cpfLimpo)) {
-            throw new RuntimeException("Operação cancelada: Já existe um funcionário com este CPF.");
+            throw new RegraDeNegocioException("Operação cancelada: Já existe um funcionário com este CPF.");
         }
 
         TipoCargo enumTratado;
         try {
             enumTratado = TipoCargo.valueOf(dto.cargo().toUpperCase().trim());
         } catch (IllegalArgumentException e) {
-            throw new RuntimeException("Cargo inválido! Opções: ADMINISTRADOR, ATENDENTE, DESENVOLVEDOR.");
+            throw new RegraDeNegocioException("Cargo inválido! Opções: ADMINISTRADOR, ATENDENTE, DESENVOLVEDOR.");
         }
 
         Cargo cargo = cargoRepository.findByNomeCargo(enumTratado)
@@ -105,7 +107,7 @@ public class FuncionarioService {
 
     public FuncionarioResponseDTO buscarMatriculaFuncionario(String matricula){
         FuncionarioEntity funcionarioEncontrado = funcionarioRepository.findById(matricula)
-        .orElseThrow(()->  new IllegalArgumentException("Funcionário com a matricula " + matricula + " não encontrado"));
+        .orElseThrow(()->  new RecursoNaoEncontradoException("Funcionário com a matricula " + matricula + " não encontrado"));
 
         return funcionarioMapper.toDto(funcionarioEncontrado);
     }
@@ -114,7 +116,7 @@ public class FuncionarioService {
         String cpfLimpo = DocumentoUtil.limpaFormatacao(cpf);
 
         FuncionarioEntity funcionarioEncontrado = funcionarioRepository.findByCpf(cpfLimpo)
-        .orElseThrow(() -> new IllegalArgumentException("Funcionário com cpf " + cpf + " não encontrado!"));
+        .orElseThrow(() -> new RecursoNaoEncontradoException("Funcionário com cpf " + cpf + " não encontrado!"));
         
         return funcionarioMapper.toDto(funcionarioEncontrado);
     }
@@ -123,7 +125,7 @@ public class FuncionarioService {
         List<FuncionarioEntity> funcionarioEncontrados = funcionarioRepository.findByNomeContainingIgnoreCase(nome);
 
         if(funcionarioEncontrados.isEmpty()){
-            throw new RuntimeException("Nenhum funcionário encontrado com o nome: " + nome);
+            throw new RecursoNaoEncontradoException("Nenhum funcionário encontrado com o nome: " + nome);
         }
 
         return funcionarioEncontrados.stream()
@@ -142,12 +144,19 @@ public class FuncionarioService {
     public FuncionarioResponseDTO atualizar(String matricula, FuncionarioRequestDTO dto) {
         
         FuncionarioEntity entidade = funcionarioRepository.findById(matricula)
-                .orElseThrow(() -> new RuntimeException("Funcionário não encontrado com a matrícula: " + matricula));
+                .orElseThrow(() -> new RecursoNaoEncontradoException("Funcionário não encontrado com a matrícula: " + matricula));
 
         entidade.setNome(dto.nome());
         entidade.setDataAdmissao(dto.dataAdmissao());
 
-        TipoCargo enumTratado = TipoCargo.valueOf(dto.cargo().toUpperCase().trim());
+        TipoCargo enumTratado;
+        try{
+            enumTratado = TipoCargo.valueOf(dto.cargo().toUpperCase().trim());
+        }
+        catch(IllegalArgumentException e){
+            throw new RegraDeNegocioException("Cargo Inválido! Opções Ex: ADMINISTRADOR, ATENDENTE, DESENVOLVEDOR.");
+        }
+        
         Cargo cargo = cargoRepository.findByNomeCargo(enumTratado)
             .orElseGet(() -> {
                 Cargo novoCargo = new Cargo();
@@ -167,7 +176,7 @@ public class FuncionarioService {
     @Transactional
     public void deletar(String matricula) {
         FuncionarioEntity entidade = funcionarioRepository.findById(matricula)
-                .orElseThrow(() -> new RuntimeException("Funcionário não encontrado com a matrícula: " + matricula));
+                .orElseThrow(() -> new RecursoNaoEncontradoException("Funcionário não encontrado com a matrícula: " + matricula));
         
         funcionarioRepository.delete(entidade);
     }
