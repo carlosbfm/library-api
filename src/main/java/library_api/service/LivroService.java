@@ -162,7 +162,7 @@ public class LivroService {
     @Transactional
     public void deletar(Long codLivro) {
         LivroEntity livroEncontrado = livroRepository.findById(codLivro)
-                .orElseThrow(() -> new RuntimeException("Nenhum livro encontrado com código: " + codLivro));
+                .orElseThrow(() -> new RecursoNaoEncontradoException("Nenhum livro encontrado com código: " + codLivro));
         livroRepository.delete(livroEncontrado);
     }
 }
