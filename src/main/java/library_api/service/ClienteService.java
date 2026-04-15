@@ -8,11 +8,14 @@ import org.springframework.transaction.annotation.Transactional;
 
 import library_api.dto.request.ClienteRequestDTO;
 import library_api.dto.response.ClienteResponseDTO;
+import library_api.exception.RecursoNaoEncontradoException;
+import library_api.exception.RegraDeNegocioException;
 import library_api.mapper.ClienteMapper;
 import library_api.model.entity.cliente.ClienteEntity;
 import library_api.model.enums.TipoCliente;
 import library_api.repository.ClienteRepository;
 import library_api.util.AjusteDocumentos;
+import library_api.util.DocumentoUtil;
 import library_api.util.GeradorDeCodigos;
 import library_api.util.ValidarDocumentosCliente;
 import lombok.RequiredArgsConstructor;
@@ -31,11 +34,14 @@ public class ClienteService {
 
         ValidarDocumentosCliente.validarDocumentosObrigatorios(dto);
 
-        if(dto.cpf() != null && clienteRepository.existsByCpf(dto.cpf())){
-            throw new RuntimeException("Já existe um cliente cadastrado com o CPF: " + dto.cpf());
+        String cpfLimpo = dto.cpf() != null ? DocumentoUtil.limpaFormatacao(dto.cpf()) : null;
+        String cnpjLimpo = dto.cnpj() != null ? DocumentoUtil.limpaFormatacao(dto.cnpj()) : null;
+
+        if(cpfLimpo != null && clienteRepository.existsByCpf(cpfLimpo)){
+            throw new RegraDeNegocioException("Já existe um cliente cadastrado com o CPF: " + dto.cpf());
         }
-        if(dto.cnpj() != null && clienteRepository.existsByCnpj(dto.cnpj())){
-            throw new RuntimeException("Já existe um cliente cadastrado com o CNPJ: " + dto.cnpj());
+        if(cnpjLimpo != null && clienteRepository.existsByCnpj(cnpjLimpo)){
+            throw new RegraDeNegocioException("Já existe um cliente cadastrado com o CNPJ: " + dto.cnpj());
         }
 
         AjusteDocumentos.ajustarDocumentosPorTipo(cliente, dto);
@@ -55,10 +61,6 @@ public class ClienteService {
     public List<ClienteResponseDTO> buscarPorNome(String nome){
         List<ClienteEntity> clientesEncontrados = clienteRepository.findByNomeClienteContainingIgnoreCase(nome);
 
-        if(clientesEncontrados.isEmpty()){
-            throw new RuntimeException("Clientes não encontrados com o nome: " + nome);
-        }
-
         return clientesEncontrados.stream()
                 .map(clienteMapper::toDto)
                 .toList();
@@ -66,10 +68,6 @@ public class ClienteService {
 
     public List<ClienteResponseDTO> buscarTipoCliente(TipoCliente tipoCliente){
         List<ClienteEntity> clientesEncontrados = clienteRepository.findByTipoCliente(tipoCliente);
-        
-        if(clientesEncontrados.isEmpty()){
-            throw new RuntimeException("Nenhum cliente encontrado do tipo: " + tipoCliente);
-        }
 
         return clientesEncontrados.stream()
                 .map(clienteMapper::toDto)
@@ -77,22 +75,26 @@ public class ClienteService {
     }
 
     public ClienteResponseDTO buscarPorCpf(String cpf){
-        ClienteEntity clienteEncontrado = clienteRepository.findByCpf(cpf)
-                .orElseThrow(() -> new RuntimeException("Cliente não encontrado com o CPF: " + cpf));
+        String cpfLimpo = DocumentoUtil.limpaFormatacao(cpf);
+
+        ClienteEntity clienteEncontrado = clienteRepository.findByCpf(cpfLimpo)
+                .orElseThrow(() -> new RecursoNaoEncontradoException("Cliente não encontrado com o CPF: " + cpf));
         
         return clienteMapper.toDto(clienteEncontrado);
     }
 
     public ClienteResponseDTO buscarPorCnpj(String cnpj){
-        ClienteEntity clienteEncontrado = clienteRepository.findByCnpj(cnpj)
-                .orElseThrow(() -> new RuntimeException("Cliente não encontrado com o CNPJ: " + cnpj));
+        String cnpjLimpo = DocumentoUtil.limpaFormatacao(cnpj);
+
+        ClienteEntity clienteEncontrado = clienteRepository.findByCnpj(cnpjLimpo)
+                .orElseThrow(() -> new RecursoNaoEncontradoException("Cliente não encontrado com o CNPJ: " + cnpj));
         
         return clienteMapper.toDto(clienteEncontrado);
     }
 
     public ClienteResponseDTO buscarPorCodCliente(Long codCliente){
         ClienteEntity clienteEncontrado = clienteRepository.findById(codCliente).
-        orElseThrow(() -> new RuntimeException("Cliente não encontrado com o Código: " + codCliente));
+        orElseThrow(() -> new RecursoNaoEncontradoException("Cliente não encontrado com o Código: " + codCliente));
 
         return clienteMapper.toDto(clienteEncontrado);
     }
@@ -100,15 +102,18 @@ public class ClienteService {
     @Transactional
     public ClienteResponseDTO atualizar(Long codCliente, ClienteRequestDTO dto){
         ClienteEntity clienteAtual = clienteRepository.findById(codCliente)
-        .orElseThrow(() -> new RuntimeException("Nenhum cliente encontrado com código: " + codCliente));
+        .orElseThrow(() -> new RecursoNaoEncontradoException("Nenhum cliente encontrado com código: " + codCliente));
 
         ValidarDocumentosCliente.validarDocumentosObrigatorios(dto);
 
-        if(dto.cpf() != null && !dto.cpf().equals(clienteAtual.getCpf()) && clienteRepository.existsByCpf(dto.cpf())){
-            throw new RuntimeException("Já existe um cliente cadastrado com o CPF: " + dto.cpf());
+        String cpfLimpo = dto.cpf() != null ? DocumentoUtil.limpaFormatacao(dto.cpf()) : null;
+        String cnpjLimpo = dto.cnpj() != null ? DocumentoUtil.limpaFormatacao(dto.cnpj()) : null;
+
+        if(cpfLimpo != null && !cpfLimpo.equals(clienteAtual.getCpf()) && clienteRepository.existsByCpf(cpfLimpo)){
+            throw new RegraDeNegocioException("Já existe um cliente cadastrado com o CPF: " + dto.cpf());
         }
-        if(dto.cnpj() != null && !dto.cnpj().equals(clienteAtual.getCnpj()) && clienteRepository.existsByCnpj(dto.cnpj())){
-            throw new RuntimeException("Já existe um cliente cadastrado com o CNPJ: " + dto.cnpj());
+        if(cnpjLimpo != null && !cnpjLimpo.equals(clienteAtual.getCnpj()) && clienteRepository.existsByCnpj(cnpjLimpo)){
+            throw new RegraDeNegocioException("Já existe um cliente cadastrado com o CNPJ: " + dto.cnpj());
         }
 
         AjusteDocumentos.ajustarDocumentosPorTipo(clienteAtual, dto);
@@ -116,14 +121,13 @@ public class ClienteService {
         clienteAtual.setTipoCliente(dto.tipoCliente());
         clienteAtual.setNomeCliente(dto.nomeCliente());
 
-        ClienteEntity clienteSalvo = clienteRepository.save(clienteAtual);
-        return clienteMapper.toDto(clienteSalvo);
+        return clienteMapper.toDto(clienteAtual);
     }
 
     @Transactional
     public void deletar(Long codCliente){
         ClienteEntity clienteDeletado =  clienteRepository.findById(codCliente) 
-            .orElseThrow(() -> new RuntimeException("Cliente não encontrado com código: " + codCliente));
+            .orElseThrow(() -> new RecursoNaoEncontradoException("Cliente não encontrado com código: " + codCliente));
         clienteRepository.delete(clienteDeletado);
     }
 }

@@ -169,8 +169,7 @@ public class FuncionarioService {
         
         entidade.getUsuario().setRoles("ROLE_" + cargo.getNomeCargo().name());
 
-        FuncionarioEntity entidadeAtualizada = funcionarioRepository.save(entidade);
-        return funcionarioMapper.toDto(entidadeAtualizada);
+        return funcionarioMapper.toDto(entidade);
     }
 
     @Transactional
