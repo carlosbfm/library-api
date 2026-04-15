@@ -46,56 +46,36 @@ public class LivroService {
 
     public LivroResponseDTO buscarPorCodigo(Long codLivro) {
         LivroEntity buscaCod = livroRepository.findById(codLivro)
-                .orElseThrow(() -> new RuntimeException("Livro não encontrado com o código: " + codLivro));
+                .orElseThrow(() -> new RecursoNaoEncontradoException("Livro não encontrado com o código: " + codLivro));
 
         return livroMapper.toDto(buscaCod);
     }
 
     public List<LivroResponseDTO> buscarPorTitulo(String titulo) {
-        List<LivroEntity> livrosEncontrados = livroRepository.findByTituloLivroContainingIgnoreCase(titulo);
 
-        if (livrosEncontrados.isEmpty()) {
-            throw new RuntimeException("Nenhum livro encontrado com título: " + titulo);
-        }
-
-        return livrosEncontrados.stream()
+        return livroRepository.findByTituloLivroContainingIgnoreCase(titulo).stream()
                 .map(livroMapper::toDto)
                 .toList();
     }
 
     public List<LivroResponseDTO> buscarPorAutor(String autor) {
-        List<LivroEntity> autoresEncontrados = livroRepository.findByAutorContainingIgnoreCase(autor);
 
-        if (autoresEncontrados.isEmpty()) {
-            throw new RuntimeException("Nenhum livro encontrado com autor: " + autor);
-        }
-
-        return autoresEncontrados.stream()
+        return livroRepository.findByAutorContainingIgnoreCase(autor).stream()
                 .map(livroMapper::toDto)
                 .toList();
     }
 
     public List<LivroResponseDTO> buscarPorGenero(String genero) {
-        List<LivroEntity> generosEncontrados = livroRepository.findByGeneroContainingIgnoreCase(genero);
 
-        if (generosEncontrados.isEmpty()) {
-            throw new RuntimeException("Nenhum livro encontrado com o gênero: " + genero);
-        }
-
-        return generosEncontrados.stream()
+        return livroRepository.findByGeneroContainingIgnoreCase(genero).stream()
                 .map(livroMapper::toDto)
                 .toList();
     }
 
     public List<LivroResponseDTO> buscarPorIsbn(String isbn) {
         String isbnLimpa = DocumentoUtil.limpaFormatacao(isbn);
-        List<LivroEntity> livroEncontrados = livroRepository.findByIsbnContainingIgnoreCase(isbnLimpa);
 
-        if (livroEncontrados.isEmpty()) {
-            throw new RuntimeException("Nenhum livro encontrado com a isbn: " + isbnLimpa);
-        }
-
-        return livroEncontrados.stream()
+        return livroRepository.findByIsbnContainingIgnoreCase(isbnLimpa).stream()
                 .map(livroMapper::toDto)
                 .toList();
     }
@@ -111,35 +91,32 @@ public class LivroService {
     public LivroResponseDTO atualizar(Long codLivro, LivroRequestDTO dto) {
 
         LivroEntity entidade = livroRepository.findByCodLivro(codLivro)
-                .orElseThrow(() -> new RuntimeException("Livro não encontrado com o código: " + codLivro));
+                .orElseThrow(() -> new RecursoNaoEncontradoException("Livro não encontrado com o código: " + codLivro));
 
         String isbnLimpa = DocumentoUtil.limpaFormatacao(dto.isbn());
 
         livroRepository.findByIsbn(isbnLimpa).ifPresent(livroExistente -> {
             if (!livroExistente.getCodLivro().equals(codLivro)) {
-                throw new RuntimeException(
+                throw new RegraDeNegocioException(
                         "Violação de Integridade: O ISBN " + isbnLimpa + " já pertence a outro livro!");
             }
         });
 
         livroMapper.atualizarDeDto(dto, entidade);
-
         entidade.setIsbn(isbnLimpa);
 
-        LivroEntity livroAtualizado = livroRepository.save(entidade);
-        return livroMapper.toDto(livroAtualizado);
+        return livroMapper.toDto(entidade);
     }
 
     @Transactional
     public void reportarPerda(Long codLivro) {
         LivroEntity livro = livroRepository.findById(codLivro)
-                .orElseThrow(() -> new RuntimeException("Livro não encontrado com o código: " + codLivro));
+                .orElseThrow(() -> new RecursoNaoEncontradoException("Livro não encontrado com o código: " + codLivro));
         if (livro.getStatus() == StatusLivro.PERDIDO) {
-            throw new RuntimeException("Este Livro Já consta como perdido no sistema");
+            throw new RegraDeNegocioException("Este Livro Já consta como perdido no sistema");
         }
 
         livro.setStatus(StatusLivro.PERDIDO);
-        livroRepository.save(livro);
     }
 
     @Transactional
@@ -163,25 +140,23 @@ public class LivroService {
     @Transactional
     public void reportarLivroDanificado(Long codLivro) {
         LivroEntity livro = livroRepository.findById(codLivro)
-                .orElseThrow(() -> new RuntimeException("Livro não encontrado com o código: " + codLivro));
+                .orElseThrow(() -> new RecursoNaoEncontradoException("Livro não encontrado com o código: " + codLivro));
         if (livro.getStatus() == StatusLivro.DANIFICADO) {
-            throw new RuntimeException("Este Livro Já consta como danificado no sistema");
+            throw new RegraDeNegocioException("Este Livro Já consta como danificado no sistema");
         }
 
         livro.setStatus(StatusLivro.DANIFICADO);
-        livroRepository.save(livro);
     }
 
     @Transactional
     public void alterarPraDisponivel(Long codLivro) {
         LivroEntity livro = livroRepository.findById(codLivro)
-                .orElseThrow(() -> new RuntimeException("Livro não encontrado com o código: " + codLivro));
+                .orElseThrow(() -> new RecursoNaoEncontradoException("Livro não encontrado com o código: " + codLivro));
         if (livro.getStatus() == StatusLivro.DISPONIVEL) {
-            throw new RuntimeException("Este Livro Já consta como disponível no sistema");
+            throw new RegraDeNegocioException("Este Livro Já consta como disponível no sistema");
         }
 
         livro.setStatus(StatusLivro.DISPONIVEL);
-        livroRepository.save(livro);
     }
 
     @Transactional
