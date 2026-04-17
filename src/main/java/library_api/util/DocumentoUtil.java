@@ -13,6 +13,10 @@ public class DocumentoUtil {
         return documento.replaceAll("\\D", "");
     }
 
+    public static String limpaIsbn(String documento){
+        return documento == null ? "" : documento.replaceAll("\\D", "");
+    }
+
     // Método de Saída: Desenha a máscara do ISBN para o Postman
     public static String formataIsbn(String isbn) {
         if (isbn == null || isbn.length() != 13) {

@@ -29,7 +29,11 @@ public class LivroService {
     public LivroResponseDTO cadastrar(LivroRequestDTO dto) {
         LivroEntity livro = livroMapper.toEntity(dto);
 
-        String isbnLimpo = DocumentoUtil.formataIsbn(dto.isbn());
+        String isbnLimpo = DocumentoUtil.limpaIsbn(dto.isbn());
+
+        if(isbnLimpo.isEmpty()){
+            throw new RegraDeNegocioException("ISBN inválido. Certifique-se de digitar números válidos");
+        }
 
         Long codigoGerado;
         do {
@@ -73,7 +77,16 @@ public class LivroService {
     }
 
     public List<LivroResponseDTO> buscarPorIsbn(String isbn) {
-        String isbnLimpa = DocumentoUtil.limpaFormatacao(isbn);
+
+        if(isbn == null || isbn.trim().isEmpty()){
+            return listarTodos();
+        }
+
+        String isbnLimpa = DocumentoUtil.limpaIsbn(isbn);
+
+        if(isbnLimpa.isEmpty()){
+            return List.of();
+        }
 
         return livroRepository.findByIsbnContainingIgnoreCase(isbnLimpa).stream()
                 .map(livroMapper::toDto)

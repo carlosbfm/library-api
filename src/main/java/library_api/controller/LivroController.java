@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import jakarta.validation.Valid;
@@ -62,9 +63,11 @@ public class LivroController {
         return ResponseEntity.ok(responseDTOs);
     }
 
-    @PreAuthorize("isAuthenticated")
-    @GetMapping("/isbn/{isbn}")
-    public ResponseEntity<List<LivroResponseDTO>> buscarLivroPorIsbn(@PathVariable String isbn){
+    @PreAuthorize("isAuthenticated") 
+    @GetMapping("/buscar-isbn")
+    public ResponseEntity<List<LivroResponseDTO>> buscarLivroPorIsbn(
+        @RequestParam(name = "isbn", required = false) String isbn){
+
         List<LivroResponseDTO> responseDTOs = livroService.buscarPorIsbn(isbn);
         return ResponseEntity.ok(responseDTOs);
     }
