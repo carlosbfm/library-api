@@ -43,22 +43,28 @@ public class LivroController {
     }
 
     @PreAuthorize("isAuthenticated")
-    @GetMapping("/titulo/{titulo}")
-    public ResponseEntity<List<LivroResponseDTO>> buscarLivroPorTitulo(@PathVariable String titulo){
+    @GetMapping("/buscar-titulo")
+    public ResponseEntity<List<LivroResponseDTO>> buscarLivroPorTitulo
+        (@RequestParam(name = "titulo" , required = false) String titulo){
+
         List <LivroResponseDTO> responseDTOs = livroService.buscarPorTitulo(titulo);
         return ResponseEntity.ok(responseDTOs);
     }
 
     @PreAuthorize("isAuthenticated")
-    @GetMapping("/autor/{autor}")
-    public ResponseEntity<List<LivroResponseDTO>> buscarLivroPorAutor(@PathVariable String autor){
+    @GetMapping("/buscar-autor")
+    public ResponseEntity<List<LivroResponseDTO>> buscarLivroPorAutor(
+        @RequestParam(name = "autor" , required = false) String autor){
+
         List<LivroResponseDTO> responseDTOs = livroService.buscarPorAutor(autor);
         return ResponseEntity.ok(responseDTOs);
     }
 
     @PreAuthorize("isAuthenticated")
-    @GetMapping("/genero/{genero}")
-    public ResponseEntity<List<LivroResponseDTO>> buscarLivroPorGenero(@PathVariable String genero){
+    @GetMapping("/buscar-genero")
+    public ResponseEntity<List<LivroResponseDTO>> buscarLivroPorGenero
+        (@RequestParam(name = "genero" , required = false) String genero){
+        
         List<LivroResponseDTO> responseDTOs = livroService.buscarPorGenero(genero);
         return ResponseEntity.ok(responseDTOs);
     }

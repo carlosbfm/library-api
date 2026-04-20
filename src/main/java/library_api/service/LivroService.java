@@ -57,6 +57,10 @@ public class LivroService {
 
     public List<LivroResponseDTO> buscarPorTitulo(String titulo) {
 
+        if(titulo == null || titulo.trim().isEmpty()){
+            return listarTodos();
+        }
+
         return livroRepository.findByTituloLivroContainingIgnoreCase(titulo).stream()
                 .map(livroMapper::toDto)
                 .toList();
@@ -64,12 +68,20 @@ public class LivroService {
 
     public List<LivroResponseDTO> buscarPorAutor(String autor) {
 
+        if(autor == null || autor.trim().isEmpty()){
+            return listarTodos();
+        }
+
         return livroRepository.findByAutorContainingIgnoreCase(autor).stream()
                 .map(livroMapper::toDto)
                 .toList();
     }
 
     public List<LivroResponseDTO> buscarPorGenero(String genero) {
+
+        if(genero == null || genero.trim().isEmpty()){
+            return  listarTodos();
+        }
 
         return livroRepository.findByGeneroContainingIgnoreCase(genero).stream()
                 .map(livroMapper::toDto)
@@ -107,6 +119,10 @@ public class LivroService {
                 .orElseThrow(() -> new RecursoNaoEncontradoException("Livro não encontrado com o código: " + codLivro));
 
         String isbnLimpa = DocumentoUtil.limpaFormatacao(dto.isbn());
+
+        if (isbnLimpa.isEmpty()) {
+            throw new RegraDeNegocioException("ISBN inválido para atualização. Certifique-se de digitar números válidos.");
+        }
 
         livroRepository.findByIsbn(isbnLimpa).ifPresent(livroExistente -> {
             if (!livroExistente.getCodLivro().equals(codLivro)) {
