@@ -4,6 +4,8 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
@@ -15,18 +17,18 @@ public interface LivroRepository extends JpaRepository<LivroEntity, Long> {
 
     Optional<LivroEntity> findByCodLivro(Long codLivro);
 
-    List<LivroEntity> findByTituloLivroContainingIgnoreCase(String tituloLivro);
+    Page<LivroEntity> findByAutorContainingIgnoreCase(String autor, Pageable pageable);
 
-    List<LivroEntity> findByAutorContainingIgnoreCase(String autor);
+    Page<LivroEntity> findByGeneroContainingIgnoreCase(String genero, Pageable pageable);
 
-    List<LivroEntity> findByGeneroContainingIgnoreCase(String genero);
-
-    List<LivroEntity> findByIsbnContainingIgnoreCase(String isbn);
+    Page<LivroEntity> findByIsbnContainingIgnoreCase(String isbn,Pageable pageable);
 
     Optional<LivroEntity> findByIsbn(String isbn);
 
     List<LivroEntity> findByData(LocalDate data);
 
     List<LivroEntity> findByDataBetween(LocalDate inicio, LocalDate fim);
+
+    Page<LivroEntity> findByTituloLivroContainingIgnoreCase(String titulo, Pageable pageable);
 
 }

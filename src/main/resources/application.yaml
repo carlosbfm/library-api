@@ -7,6 +7,12 @@ spring:
     username: admin
     password: admin
     driver-class-name: org.postgresql.Driver
+  
+  data:
+    web:
+      pageable:
+        default-page-size: 5
+        max-page-size: 100
 
   jpa:
     hibernate:

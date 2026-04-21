@@ -1,7 +1,8 @@
 package library_api.controller;
 
-import java.util.List;
-
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -30,102 +31,107 @@ public class LivroController {
 
     @PreAuthorize("hasAnyRole('ROLE_ADMIN','ROLE_COORDENADOR','ROLE_BIBLIOTECARIO')")
     @PostMapping
-    public ResponseEntity<LivroResponseDTO> cadastrar(@RequestBody @Valid LivroRequestDTO dto){
+    public ResponseEntity<LivroResponseDTO> cadastrar(@RequestBody @Valid LivroRequestDTO dto) {
         LivroResponseDTO responseDto = livroService.cadastrar(dto);
         return ResponseEntity.status(HttpStatus.CREATED).body(responseDto);
     }
 
     @PreAuthorize("isAuthenticated")
     @GetMapping("/codLivro/{codLivro}")
-    public ResponseEntity<LivroResponseDTO> buscarLivroPorCod(@PathVariable Long codLivro){
+    public ResponseEntity<LivroResponseDTO> buscarLivroPorCod(@PathVariable Long codLivro) {
         LivroResponseDTO responseDTO = livroService.buscarPorCodigo(codLivro);
         return ResponseEntity.ok(responseDTO);
     }
 
     @PreAuthorize("isAuthenticated")
     @GetMapping("/buscar-titulo")
-    public ResponseEntity<List<LivroResponseDTO>> buscarLivroPorTitulo
-        (@RequestParam(name = "titulo" , required = false) String titulo){
+    public ResponseEntity<Page<LivroResponseDTO>> buscarLivroPorTitulo(
+            @RequestParam(name = "titulo", required = false) String titulo,
+            @PageableDefault(page = 0, size = 5) Pageable pageable) {
 
-        List <LivroResponseDTO> responseDTOs = livroService.buscarPorTitulo(titulo);
+        Page<LivroResponseDTO> responseDTOs = livroService.buscarPorTitulo(titulo, pageable);
         return ResponseEntity.ok(responseDTOs);
     }
 
     @PreAuthorize("isAuthenticated")
     @GetMapping("/buscar-autor")
-    public ResponseEntity<List<LivroResponseDTO>> buscarLivroPorAutor(
-        @RequestParam(name = "autor" , required = false) String autor){
+    public ResponseEntity<Page<LivroResponseDTO>> buscarLivroPorAutor(
+            @RequestParam(name = "autor", required = false) String autor,
+            @PageableDefault(page = 0,size = 5)Pageable pageable) {
 
-        List<LivroResponseDTO> responseDTOs = livroService.buscarPorAutor(autor);
+        Page<LivroResponseDTO> responseDTOs = livroService.buscarPorAutor(autor,pageable);
         return ResponseEntity.ok(responseDTOs);
     }
 
     @PreAuthorize("isAuthenticated")
     @GetMapping("/buscar-genero")
-    public ResponseEntity<List<LivroResponseDTO>> buscarLivroPorGenero
-        (@RequestParam(name = "genero" , required = false) String genero){
-        
-        List<LivroResponseDTO> responseDTOs = livroService.buscarPorGenero(genero);
+    public ResponseEntity<Page<LivroResponseDTO>> buscarLivroPorGenero(
+            @RequestParam(name = "genero", required = false) String genero, 
+            @PageableDefault(page = 0, size = 5) Pageable pageable) {
+
+        Page<LivroResponseDTO> responseDTOs = livroService.buscarPorGenero(genero, pageable);
         return ResponseEntity.ok(responseDTOs);
     }
 
-    @PreAuthorize("isAuthenticated") 
+    @PreAuthorize("isAuthenticated")
     @GetMapping("/buscar-isbn")
-    public ResponseEntity<List<LivroResponseDTO>> buscarLivroPorIsbn(
-        @RequestParam(name = "isbn", required = false) String isbn){
+    public ResponseEntity<Page<LivroResponseDTO>> buscarLivroPorIsbn(
+            @RequestParam(name = "isbn", required = false) String isbn,
+            @PageableDefault(page = 0, size = 5) Pageable pageable) {
 
-        List<LivroResponseDTO> responseDTOs = livroService.buscarPorIsbn(isbn);
+        Page<LivroResponseDTO> responseDTOs = livroService.buscarPorIsbn(isbn,pageable);
         return ResponseEntity.ok(responseDTOs);
     }
 
     @PreAuthorize("isAuthenticated")
     @GetMapping
-    public ResponseEntity<List<LivroResponseDTO>> listarTodos(){
-        List<LivroResponseDTO> responseDTOs = livroService.listarTodos();
+    public ResponseEntity<Page<LivroResponseDTO>> listarTodos(
+           @PageableDefault(page = 0,  size = 5) Pageable pageable) {
+        Page<LivroResponseDTO> responseDTOs = livroService.listarTodos(pageable);
         return ResponseEntity.ok(responseDTOs);
     }
 
     @PreAuthorize("hasAnyRole('ROLE_ADMIN','ROLE_COORDENADOR','ROLE_BIBLIOTECARIO')")
     @PutMapping("/{codLivro}")
-    public ResponseEntity <LivroResponseDTO> atualizar(@PathVariable Long codLivro, 
-        @RequestBody @Valid LivroRequestDTO dto){
+    public ResponseEntity<LivroResponseDTO> atualizar(@PathVariable Long codLivro,
+            @RequestBody @Valid LivroRequestDTO dto) {
         LivroResponseDTO responseDTO = livroService.atualizar(codLivro, dto);
         return ResponseEntity.ok(responseDTO);
     }
 
     @PreAuthorize("hasAnyRole('ROLE_ADMIN','ROLE_COORDENADOR','ROLE_BIBLIOTECARIO')")
     @PatchMapping("/{codLivro}/perda")
-    public ResponseEntity<Void> reportarPerda(@PathVariable Long codLivro){
+    public ResponseEntity<Void> reportarPerda(@PathVariable Long codLivro) {
         livroService.reportarPerda(codLivro);
         return ResponseEntity.noContent().build();
     }
 
     @PreAuthorize("hasAnyRole('ROLE_ADMIN','ROLE_COORDENADOR','ROLE_BIBLIOTECARIO','ROLE_ATENDENTE')")
     @PatchMapping("/{codLivro}/emprestar")
-    public ResponseEntity<Void> emprestarLivro(@PathVariable Long codLivro){
+    public ResponseEntity<Void> emprestarLivro(@PathVariable Long codLivro) {
         livroService.alterarPraEmprestado(codLivro);
         return ResponseEntity.noContent().build();
     }
 
     @PreAuthorize("hasAnyRole('ROLE_ADMIN','ROLE_COORDENADOR','ROLE_BIBLIOTECARIO','ROLE_ATENDENTE')")
     @PatchMapping("/{codLivro}/dano")
-    public ResponseEntity<Void> reportarDano(@PathVariable Long codLivro){
+    public ResponseEntity<Void> reportarDano(@PathVariable Long codLivro) {
         livroService.reportarLivroDanificado(codLivro);
         return ResponseEntity.noContent().build();
     }
 
     @PreAuthorize("hasAnyRole('ROLE_ADMIN','ROLE_COORDENADOR','ROLE_BIBLIOTECARIO','ROLE_ATENDENTE')")
     @PatchMapping("/{codLivro}/disponibilizar")
-    public ResponseEntity<Void> disponibilizarLivro(@PathVariable Long codLivro){
+    public ResponseEntity<Void> disponibilizarLivro(@PathVariable Long codLivro) {
         livroService.alterarPraDisponivel(codLivro);
         return ResponseEntity.noContent().build();
     }
 
     @PreAuthorize("hasAnyRole('ROLE_ADMIN','ROLE_COORDENADOR')")
     @DeleteMapping("/{codLivro}")
-    public ResponseEntity<Void> deletar(@PathVariable Long codLivro){
+    public ResponseEntity<Void> deletar(@PathVariable Long codLivro) {
         livroService.deletar(codLivro);
         return ResponseEntity.noContent().build();
     }
-    
+
 }

@@ -2,6 +2,9 @@ package library_api.service;
 
 import java.util.List;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -55,61 +58,56 @@ public class LivroService {
         return livroMapper.toDto(buscaCod);
     }
 
-    public List<LivroResponseDTO> buscarPorTitulo(String titulo) {
+    public Page<LivroResponseDTO> buscarPorTitulo(String titulo, Pageable pageable) {
 
         if(titulo == null || titulo.trim().isEmpty()){
-            return listarTodos();
+            return listarTodos(pageable);
         }
 
-        return livroRepository.findByTituloLivroContainingIgnoreCase(titulo).stream()
-                .map(livroMapper::toDto)
-                .toList();
+        return livroRepository.findByTituloLivroContainingIgnoreCase(titulo ,pageable)
+                .map(livroMapper::toDto);
     }
 
-    public List<LivroResponseDTO> buscarPorAutor(String autor) {
+    public Page<LivroResponseDTO> buscarPorAutor(String autor, Pageable pageable) {
 
         if(autor == null || autor.trim().isEmpty()){
-            return listarTodos();
+            return listarTodos(pageable);
         }
 
-        return livroRepository.findByAutorContainingIgnoreCase(autor).stream()
-                .map(livroMapper::toDto)
-                .toList();
+        return livroRepository.findByAutorContainingIgnoreCase(autor,pageable)
+                .map(livroMapper::toDto);
     }
 
-    public List<LivroResponseDTO> buscarPorGenero(String genero) {
+    public Page<LivroResponseDTO> buscarPorGenero(String genero,Pageable pageable) {
 
         if(genero == null || genero.trim().isEmpty()){
-            return  listarTodos();
+            return  listarTodos(pageable);
         }
 
-        return livroRepository.findByGeneroContainingIgnoreCase(genero).stream()
-                .map(livroMapper::toDto)
-                .toList();
+        return livroRepository.findByGeneroContainingIgnoreCase(genero,pageable)
+                .map(livroMapper::toDto);
     }
 
-    public List<LivroResponseDTO> buscarPorIsbn(String isbn) {
+    public Page<LivroResponseDTO> buscarPorIsbn(String isbn, Pageable pageable) {
 
         if(isbn == null || isbn.trim().isEmpty()){
-            return listarTodos();
+            return listarTodos(pageable);
         }
 
         String isbnLimpa = DocumentoUtil.limpaIsbn(isbn);
 
         if(isbnLimpa.isEmpty()){
-            return List.of();
+            return Page.empty(pageable);
         }
 
-        return livroRepository.findByIsbnContainingIgnoreCase(isbnLimpa).stream()
-                .map(livroMapper::toDto)
-                .toList();
+        return livroRepository.findByIsbnContainingIgnoreCase(isbnLimpa,pageable)
+                .map(livroMapper::toDto);
     }
 
-    public List<LivroResponseDTO> listarTodos() {
-        return livroRepository.findAll()
-                .stream()
-                .map(livroMapper::toDto)
-                .toList();
+    public Page<LivroResponseDTO> listarTodos(Pageable pageable) {
+
+        return livroRepository.findAll(pageable)
+                .map(livroMapper::toDto);
     }
 
     @Transactional
